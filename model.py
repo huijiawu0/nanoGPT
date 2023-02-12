@@ -225,6 +225,7 @@ class GPT(nn.Module):
             'gpt2-large':   dict(n_layer=36, n_head=20, n_embd=1280), # 774M params
             'gpt2-xl':      dict(n_layer=48, n_head=25, n_embd=1600), # 1558M params
             'IDEA-CCNL/Wenzhong-GPT2-110M': dict(n_layer=12, n_head=12, n_embd=768),  # 124M params
+            'IDEA-CCNL/Wenzhong2.0-GPT2-3.5B-chinese': dict(n_layer=30, n_head=32, n_embd=3072, block_size=12288, )
         }[model_type]
         if model_type.startswith('gpt2'):
             print("forcing vocab_size=50257, block_size=1024, bias=True")
