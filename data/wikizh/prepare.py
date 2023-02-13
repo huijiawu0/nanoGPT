@@ -14,7 +14,7 @@ import os
 from tqdm import tqdm
 
 num_proc = 8
-dataset = load_dataset("wikipedia", language="zh", date="20230120", beam_runner="DirectRunner")
+dataset = load_dataset("wikipedia", language="zh", date="20230120", beam_runner="DirectRunner", ignore_verifications=True)
 
 # owt by default only contains the 'train' split, so create a test split
 split_dataset = dataset["train"].train_test_split(test_size=0.0005, seed=2357, shuffle=True)
