@@ -32,7 +32,7 @@ def get_single(question):
         ret.append(s)
     return ret
 
-out = "%s_%s_%s.txt" % (hf_model_path, max_length, num_return_sequences)
+out = sys.argv[4]
 with open("qa_pair.txt", 'r') as f, open(out, 'w') as g:
     for idx, line in enumerate(f):
         r = line.strip().split('|||')
