@@ -239,7 +239,7 @@ class GPT(nn.Module):
             'IDEA-CCNL/Wenzhong-GPT2-110M': dict(n_layer=12, n_head=12, n_embd=768),  # 124M params
             'IDEA-CCNL/Wenzhong2.0-GPT2-3.5B-chinese': dict(n_layer=30, n_head=32, n_embd=3072)
         }[model_type]
-        if model_type.startswith('gpt2') or model_type.startswith('IDEA-CCNL'):
+        if model_type.startswith('gpt2'):
             print("forcing vocab_size=50257, block_size=1024, bias=True")
             config_args['vocab_size'] = 50257  # always 50257 for GPT model checkpoints
             config_args['block_size'] = 1024  # always 1024 for GPT model checkpoints
@@ -275,7 +275,8 @@ class GPT(nn.Module):
                     sd[k].copy_(sd_hf[k].t())
             else:
                 # vanilla copy over the other parameters
-                assert sd_hf[k].shape == sd[k].shape
+                if sd_hf[k].shape != sd[k].shape:
+                    raise Exception("hf %s vs. %s" % (sd_hf[k].shape, sd[k].shape))
                 with torch.no_grad():
                     sd[k].copy_(sd_hf[k])
         
