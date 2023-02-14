@@ -11,6 +11,7 @@ from model import GPTConfig, GPT
 # -----------------------------------------------------------------------------
 init_from = 'resume' # either 'resume' (from an out_dir) or a gpt2 variant (e.g. 'gpt2-xl')
 out_dir = 'out' # ignored if init_from is not 'resume'
+out_file = 'qa_pair_res.txt'
 start = "\n" # or "<|endoftext|>" or etc. Can also specify a file, use as: "FILE:prompt.txt"
 num_samples = 10 # number of samples to draw
 max_new_tokens = 500 # number of tokens generated in each sample
@@ -47,6 +48,41 @@ if init_from == 'resume':
 elif init_from.startswith('gpt2'):
     # init from a given GPT-2 model
     model = GPT.from_pretrained(init_from, dict(dropout=0.0))
+elif init_from == "to_hf":
+    ckpt_path = os.path.join(out_dir, 'ckpt.pt')
+    checkpoint = torch.load(ckpt_path, map_location=device)
+    gptconf = GPTConfig(**checkpoint['model_args'])
+    model = GPT(gptconf)
+    sd = model.state_dict()
+    sd_keys = sd.keys()
+    sd_keys = [k for k in sd_keys if not k.endswith('.attn.bias')]
+    state_dict = checkpoint['model']
+    unwanted_prefix = '_orig_mod.'
+    for k, v in list(state_dict.items()):
+        if k.startswith(unwanted_prefix):
+            state_dict[k[len(unwanted_prefix):]] = state_dict.pop(k)
+    model.load_state_dict(state_dict)
+    
+    from transformers import GPT2LMHeadModel, GPT2Config
+    conf = GPT2Config()
+    model_hf = GPT2LMHeadModel(conf)
+    sd_hf = model_hf.state_dict()
+    sd_keys_hf = sd_hf.keys()
+    sd_keys_hf = [k for k in sd_keys_hf if not k.endswith('.attn.masked_bias')]
+    sd_keys_hf = [k for k in sd_keys_hf if not k.endswith('.attn.bias')]
+    transposed = ['attn.c_attn.weight', 'attn.c_proj.weight', 'mlp.c_fc.weight', 'mlp.c_proj.weight']
+    assert len(sd_keys_hf) == len(sd_keys), f"mismatched keys: {len(sd_keys_hf)} != {len(sd_keys)}"
+    for k in sd_keys_hf:
+        if any(k.endswith(w) for w in transposed):
+            # special treatment for the Conv1D weights we need to transpose
+            assert sd_hf[k].shape[::-1] == sd[k].shape
+            with torch.no_grad():
+                sd_hf[k].copy_(sd[k].t())
+        else:
+            # vanilla copy over the other parameters
+            assert sd_hf[k].shape == sd[k].shape
+            with torch.no_grad():
+                sd_hf[k].copy_(sd[k])
 
 model.eval()
 model.to(device)
@@ -87,7 +123,7 @@ def gen(start):
 
 # encode the beginning of the prompt
 if start.startswith('FILE:'):
-    with open(start[5:], 'r', encoding='utf-8') as f, open("%s_res.txt" % start[5:], 'w') as g:
+    with open(start[5:], 'r', encoding='utf-8') as f, open(out_file, 'w') as g:
         for idx, line in enumerate(f):
             r = line.strip().split('|||')
             if len(r) != 2: continue
