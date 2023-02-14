@@ -227,7 +227,7 @@ class GPT(nn.Module):
         override_args = override_args or {}  # default to empty dict
         # only dropout can be overridden see more notes below
         assert all(k == 'dropout' for k in override_args)
-        from transformers import GPT2LMHeadModel
+        from transformers import GPT2LMHeadModel, GPT2Config
         print("loading weights from pretrained gpt: %s" % model_type)
         
         # n_layer, n_head and n_embd are determined from model_type
@@ -248,8 +248,10 @@ class GPT(nn.Module):
         if 'dropout' in override_args:
             print(f"overriding dropout rate to {override_args['dropout']}")
             config_args['dropout'] = override_args['dropout']
-        if model_type.startswith('IDEA_CCNL'):
-            config_args['dropout'] = 0.1
+        if model_type.startswith('IDEA-CCNL'):
+            conf_hf = GPT2Config.from_pretrained(model_type)
+            config_args['dropout'] = conf_hf.attn_pdrop
+            # config_args['bias'] =
         # create a from-scratch initialized minGPT model
         config = GPTConfig(**config_args)
         model = GPT(config)
