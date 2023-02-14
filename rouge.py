@@ -83,6 +83,8 @@ if __name__ == "__main__":
             line = line.strip()
             if not line:
                 continue
+            if len(line.split('|||')) != 3:
+                continue
             _, ref, sys = line.split("|||")
             multi_sys = sys.split("<s>")
             temp1 = [F_1(ele, ref, beta=1) for ele in multi_sys]
