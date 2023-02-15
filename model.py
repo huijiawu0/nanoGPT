@@ -253,7 +253,6 @@ class GPT(nn.Module):
             print(f"overriding dropout rate to {conf_hf.attn_pdrop}")
             config_args['dropout'] = conf_hf.attn_pdrop
             override_args['dropout'] = conf_hf.attn_pdrop
-            # config_args['bias'] =
         # create a from-scratch initialized minGPT model
         config = GPTConfig(**config_args)
         model = GPT(config)
