@@ -129,28 +129,22 @@ def gen(start):
 
 
 def gen_hf(question):
-    # question = "写一篇神经网络的报告"
-    inputs = tokenizer(question, return_tensors='pt').to("cuda")
+    inputs = encode(question)
     assert isinstance(model, GPT2LMHeadModel)
     generation_output = model.generate(**inputs,
-                                       return_dict_in_generate=True,
-                                       output_scores=True,
-                                       max_length=max_new_tokens,
-                                       do_sample=True,
-                                       top_p=0.6,
-                                       # num_beams=5,
+                                       do_sample=False,
+                                       early_stopping=True,
+                                       max_length=500,
                                        eos_token_id=50256,
                                        pad_token_id=0,
-                                       num_return_sequences=top_k,
+                                       num_return_sequences=1
                                        )
     ret = []
     for idx, sentence in enumerate(generation_output.sequences):
-        s = tokenizer.decode(sentence).split('<|endoftext|>')[0]
+        s = decode(sentence)
         ret.append(s)
     return ret
 
-
-tokenizer = GPT2Tokenizer.from_pretrained("IDEA-CCNL/Wenzhong2.0-GPT2-3.5B-chinese")
 
 # encode the beginning of the prompt
 if start.startswith('FILE:'):
@@ -165,5 +159,5 @@ if start.startswith('FILE:'):
             else:
                 res = gen(q)
             g.write("%s|||%s|||%s\n" % (q, a, '<s>'.join(res)))
-            if idx > 10:
+            if idx > 100:
                 break
