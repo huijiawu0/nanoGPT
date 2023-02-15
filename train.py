@@ -177,7 +177,7 @@ else:
     model = GPT.from_pretrained(init_from, override_args)
     print(model.config)
     # read off the created config params, so we can store them into checkpoint correctly
-    for k in ['n_layer', 'n_head', 'n_embd', 'block_size', 'bias', 'vocab_size']:
+    for k in ['n_layer', 'n_head', 'n_embd', 'block_size', 'bias', 'vocab_size', 'dropout']:
         model_args[k] = getattr(model.config, k)
 
 print(model_args)
