@@ -12,12 +12,12 @@ model.to("cuda")
 def get_single(question):
     inputs = tokenizer(question, return_tensors='pt').to("cuda")
     assert isinstance(model, GPT2LMHeadModel)
-    stop_tok = tokenizer.encode('。')[0]
+    # stop_tok = tokenizer.encode('。')[0]
     generation_output = model.generate(**inputs,
                                        do_sample=False,
                                        early_stopping=True,
                                        max_length=500,
-                                       eos_token_id=stop_tok,
+                                       eos_token_id=50256,
                                        pad_token_id=0,
                                        num_return_sequences=1
                                        )
