@@ -10,22 +10,22 @@ eos_token_id = tokenizer.eos_token_id
 
 
 def get_single(question):
-    inputs = tokenizer(question, return_tensors='pt').to("cuda")
+    inputs = tokenizer(question, return_tensors='pt', add_special_tokens=False).to(model.device)
     assert isinstance(model, GPT2LMHeadModel)
-    # stop_tok = tokenizer.encode('。')[0]
-    generation_output = model.generate(**inputs,
-                                       do_sample=False,
-                                       early_stopping=True,
-                                       max_length=500,
-                                       eos_token_id=eos_token_id,
-                                       pad_token_id=0,
-                                       num_return_sequences=1
-                                       )
+    gen = model.generate(inputs=inputs['input_ids'],
+                         do_sample=False,
+                         early_stopping=True,
+                         max_length=500,
+                         eos_token_id=eos_token_id,
+                         pad_token_id=0,
+                         num_return_sequences=1
+                         )
     ret = []
-    for idx, sentence in enumerate(generation_output):
-        s = tokenizer.decode(sentence).split('<|endoftext|>')[0]
+    for idx, sentence in enumerate(tokenizer.batch_decode(gen)):
+        s = sentence.split('<|endoftext|>')[0]
         ret.append(s)
     return ret
+
 
 out = sys.argv[2]
 with open("qa_pair.txt", 'r') as f, open(out, 'w') as g:
