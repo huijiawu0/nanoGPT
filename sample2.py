@@ -108,19 +108,14 @@ if load_meta:
     stoi, itos = meta['stoi'], meta['itos']
     encode = lambda s: [stoi[c] for c in s]
     decode = lambda l: ''.join([itos[i] for i in l])
-elif init_from.startswith('gpt2'):
-    # ok let's assume gpt-2 encodings by default
-    print("No meta.pkl found, assuming GPT-2 encodings...")
-    enc = tiktoken.get_encoding("gpt2")
-    encode = lambda s: enc.encode(s, allowed_special={"<|endoftext|>"})
-    decode = lambda l: enc.decode(l)
 elif init_from == 'to_hf':
+    tokenizer = GPT2Tokenizer.from_pretrained("IDEA-CCNL/Wenzhong-GPT2-110M")
+    encode = lambda x: tokenizer(x, return_tensors='pt').to(device)
+    decode = lambda x: tokenizer.decode(x).split('<|endoftext|>')[0]
+else:
     enc = tiktoken.get_encoding("gpt2")
     encode = lambda s: enc.encode(s, allowed_special={"<|endoftext|>"})
     decode = lambda l: enc.decode(l)
-    tokenizer = GPT2Tokenizer.from_pretrained("IDEA-CCNL/Wenzhong-GPT2-110M")
-    encode1 = lambda x: tokenizer(x, return_tensors='pt').to(device)
-    decode1 = lambda x: tokenizer.decode(x).split('<|endoftext|>')[0]
 
 
 def gen(start):
@@ -136,7 +131,7 @@ def gen(start):
 
 
 def gen_hf(question):
-    input_ids = encode1(question)
+    input_ids = encode(question)
     assert isinstance(model, GPT2LMHeadModel)
     generation_output = model.generate(**input_ids,
                                        do_sample=False,
@@ -148,7 +143,7 @@ def gen_hf(question):
                                        )
     ret = []
     for idx, sentence in enumerate(generation_output):
-        s = decode1(sentence)
+        s = decode(sentence)
         ret.append(s)
     return ret
 
