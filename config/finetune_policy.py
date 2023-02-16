@@ -1,6 +1,6 @@
 import time
 
-out_dir = 'out-policy'
+out_dir = 'out-small-init'
 eval_interval = 5
 eval_iters = 40
 wandb_log = False
@@ -8,7 +8,7 @@ wandb_project = 'policy'
 wandb_run_name = 'ft-' + str(time.time())
 
 dataset = 'policy'
-init_from = 'out-small-init'
+init_from = 'resume'
 
 # only save checkpoints if the validation loss improves
 always_save_checkpoint = False
