@@ -28,7 +28,7 @@ def get_single(question):
     return ret
 
 out = sys.argv[2]
-with open("qa_pair.txt", 'r') as f, open(out, 'w') as g:
+with open("qa_pair_100.txt", 'r') as f, open(out, 'w') as g:
     for idx, line in enumerate(f):
         r = line.strip().split('|||')
         if len(r) != 2:
