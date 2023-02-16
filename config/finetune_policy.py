@@ -11,7 +11,7 @@ dataset = 'policy'
 init_from = 'resume'
 
 # only save checkpoints if the validation loss improves
-always_save_checkpoint = False
+always_save_checkpoint = True
 
 # the number of examples per iter:
 # 1 batch_size * 32 grad_accum * 1024 tokens = 32,768 tokens/iter
