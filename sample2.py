@@ -68,7 +68,8 @@ elif init_from == "to_hf":
             state_dict[k[len(unwanted_prefix):]] = state_dict.pop(k)
     model_pre.load_state_dict(state_dict)
 
-    conf = GPT2Config(vocab_size=gptconf.vocab_size, n_layer=gptconf.n_layer, n_head=gptconf.n_head, n_embd=gptconf.n_embd)
+    conf = GPT2Config(vocab_size=gptconf.vocab_size, n_layer=gptconf.n_layer, n_head=gptconf.n_head, n_embd=gptconf.n_embd,
+                      resid_pdrop=gptconf.dropout, attn_pdrop=gptconf.dropout, embd_pdrop=gptconf.dropout)
     model = GPT2LMHeadModel(conf)
     sd_hf = model.state_dict()
     sd_keys_hf = sd_hf.keys()
