@@ -5,8 +5,8 @@ hf_model_path = sys.argv[1]
 tokenizer = BertTokenizer.from_pretrained(hf_model_path)
 config = GPT2Config.from_pretrained(hf_model_path)
 model = GPT2LMHeadModel.from_pretrained(hf_model_path)
-
 model.to("cuda")
+eos_token_id = tokenizer.eos_token_id
 
 
 def get_single(question):
@@ -17,7 +17,7 @@ def get_single(question):
                                        do_sample=False,
                                        early_stopping=True,
                                        max_length=500,
-                                       eos_token_id=50256,
+                                       eos_token_id=eos_token_id,
                                        pad_token_id=0,
                                        num_return_sequences=1
                                        )
@@ -28,7 +28,7 @@ def get_single(question):
     return ret
 
 out = sys.argv[2]
-with open("qa_pair_100.txt", 'r') as f, open(out, 'w') as g:
+with open("qa_pair.txt", 'r') as f, open(out, 'w') as g:
     for idx, line in enumerate(f):
         r = line.strip().split('|||')
         if len(r) != 2:
