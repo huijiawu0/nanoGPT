@@ -20,7 +20,7 @@ with open('qadata.json', 'r') as f:
         jr = json.loads(line.strip())
         q = jr['question'].strip()
         a = jr['answer'].strip()
-        dataset.append(s + q + '|||' + a + e)
+        dataset.append(q + a)
 
 train_ds, valid_ds = train_test_split(dataset, test_size=0.05)
 split_dataset = DatasetDict({'train': Dataset.from_dict({"text": train_ds}),
