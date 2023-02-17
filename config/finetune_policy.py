@@ -1,8 +1,8 @@
 import time
 
-out_dir = 'out-small-init'
-eval_interval = 10
-eval_iters = 80
+out_dir = 'out-policy-finetune'
+eval_interval = 200
+eval_iters = 5000
 log_interval = 2
 wandb_log = False
 wandb_project = 'policy'
@@ -18,7 +18,7 @@ always_save_checkpoint = False
 # 1 batch_size * 32 grad_accum * 1024 tokens = 32,768 tokens/iter
 # shakespeare has 301,966 tokens, so 1 epoch ~= 9.2 iters
 batch_size = 8
-gradient_accumulation_steps = 1
+gradient_accumulation_steps = 5
 max_iters = 1000
 
 # finetune at constant LR
