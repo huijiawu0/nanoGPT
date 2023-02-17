@@ -2,26 +2,31 @@ import tiktoken
 from datasets import load_dataset, DatasetDict, Dataset  # huggingface datasets
 import numpy as np
 import os
-
+from transformers import BertTokenizer
+import json
 from sklearn.model_selection import train_test_split
 from tqdm import tqdm
 
 
 num_proc = 8
-
 dataset = []
-with open('qa_pair.txt', 'r') as f:
+
+enc = tiktoken.get_encoding("gpt2")
+s = enc.decode([enc.eot_token])
+e = enc.decode([enc.eot_token])
+
+with open('qadata.json', 'r') as f:
     for line in f:
-        rline = line.strip().split('|||')
-        if len(rline) == 2:
-            a, b = rline
-            dataset.append(a + b)
+        jr = json.loads(line.strip())
+        q = jr['question'].strip()
+        a = jr['answer'].strip()
+        dataset.append(s + q + '|||' + a + e)
 
 train_ds, valid_ds = train_test_split(dataset, test_size=0.05)
 split_dataset = DatasetDict({'train': Dataset.from_dict({"text": train_ds}),
                              'val': Dataset.from_dict({"text": valid_ds})})
 
-enc = tiktoken.get_encoding("gpt2")
+enc = BertTokenizer.get_encoding("gpt2")
 
 
 def process(example):
@@ -29,6 +34,7 @@ def process(example):
     ids.append(enc.eot_token)  # add the end of text token, e.g. 50256 for gpt2 bpe
     # note: I think eot should be prepended not appended... hmm. it's called "eot" though...
     out = {'ids': ids, 'len': len(ids)}
+    print(len(ids))
     return out
 
 
