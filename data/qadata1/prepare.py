@@ -26,8 +26,6 @@ train_ds, valid_ds = train_test_split(dataset, test_size=0.05)
 split_dataset = DatasetDict({'train': Dataset.from_dict({"text": train_ds}),
                              'val': Dataset.from_dict({"text": valid_ds})})
 
-enc = BertTokenizer.get_encoding("gpt2")
-
 
 def process(example):
     ids = enc.encode_ordinary(' '.join(example['text']))  # encode_ordinary ignores any special tokens
