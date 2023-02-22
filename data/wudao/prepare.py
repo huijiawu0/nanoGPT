@@ -3,8 +3,9 @@ import numpy as np
 import tiktoken
 from datasets import load_dataset
 from tqdm import tqdm
+import os
 
-num_proc = 6
+num_proc = round(os.cpu_count() * 0.7)
 print(num_proc)
 enc = tiktoken.get_encoding("gpt2")
 
@@ -47,10 +48,10 @@ def run_single(in_f, out_f, dfile):
         arr.flush()
         
 
-import os
+import sys
 
-in_folder1 = 'data'
-out_f = 'bin'
+in_folder1 = sys.argv[1]
+out_f = sys.argv[2]
 
 existing = set(b.strip().split('_')[0] + '.json' for b in os.listdir(out_f))
 for idx, fi in tqdm(enumerate(os.listdir(in_folder1))):
