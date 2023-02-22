@@ -1,17 +1,10 @@
-import os
-import requests
 import tiktoken
 import numpy as np
-import json
+import tiktoken
 from datasets import load_dataset
 from tqdm import tqdm
-import s3fs
-storage_options = {"key": "AKIA5AKOSQ7KIVCK7CJZ", "secret": "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"}
-s3 = s3fs.S3FileSystem(**storage_options)
 
-from transformers import GPT2TokenizerFast
-
-num_proc = os.cpu_count()
+num_proc = 6
 print(num_proc)
 enc = tiktoken.get_encoding("gpt2")
 
@@ -28,10 +21,7 @@ def process(example):
 
 
 def run_single(in_f, out_f, dfile):
-    dataset = load_dataset('json', data_files={'train': os.path.join(in_f, dfile)}, num_proc=num_proc, keep_in_memory=True)
-    # split_dataset = dataset["train"].train_test_split(test_size=0.0005, seed=2357, shuffle=True)
-    # split_dataset['val'] = split_dataset.pop('test')  # rename the test split to val
-    #
+    dataset = load_dataset('json', data_files={'train': os.path.join(in_f, dfile)}, num_proc=num_proc, keep_in_memory=False)
     tokenized = dataset.map(
         process,
         remove_columns=['title', 'content'],
@@ -54,17 +44,13 @@ def run_single(in_f, out_f, dfile):
         for example in tqdm(dset):
             arr[idx: idx + example['len']] = example['ids']
             idx += example['len']
-            # print("\tidx: %d/%d" % (idx, arr_len))
         arr.flush()
-        print(f"put file {filename} to s3...")
-        s3.put_file(filename, 's3://datawd/%s' % binname)
-        os.popen("rm %s" % filename)
-        # print(f"put file {filename} to s3 end")
+        
 
+import os
 
-import os, sys
-in_folder1 = sys.argv[1]
-out_f = '.'
+in_folder1 = 'data'
+out_f = 'bin'
 
 existing = set(b.strip().split('_')[0] + '.json' for b in os.listdir(out_f))
 for idx, fi in tqdm(enumerate(os.listdir(in_folder1))):
@@ -73,5 +59,4 @@ for idx, fi in tqdm(enumerate(os.listdir(in_folder1))):
         continue
     else:
         if fi.startswith('part-'):
-            # print("processing %s, %d/366" % (fi, idx))
             run_single(in_folder1, out_f, fi)

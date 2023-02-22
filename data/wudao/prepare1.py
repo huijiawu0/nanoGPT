@@ -1,15 +1,9 @@
 import os
-import requests
-import tiktoken
+
 import numpy as np
-import json
+import tiktoken
 from datasets import load_dataset
 from tqdm import tqdm
-# import s3fs
-# storage_options = {"key": "AKIA5AKOSQ7KIVCK7CJZ", "secret": "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"}
-# s3 = s3fs.S3FileSystem(**storage_options)
-
-from transformers import GPT2TokenizerFast
 
 num_proc = os.cpu_count()
 print(num_proc)
