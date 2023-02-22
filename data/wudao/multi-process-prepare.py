@@ -6,7 +6,7 @@ from tqdm import tqdm
 import os
 import multiprocessing
 
-num_proc = round(os.cpu_count() * 0.7)
+num_proc = round(os.cpu_count() * 0.5)
 print(num_proc)
 enc = tiktoken.get_encoding("gpt2")
 
