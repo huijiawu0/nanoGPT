@@ -21,7 +21,7 @@ def process(example):
 
 
 def run_single(in_f, out_f, dfile):
-    dataset = load_dataset('json', data_files={'train': os.path.join(in_f, dfile)}, num_proc=num_proc, keep_in_memory=False)
+    dataset = load_dataset('json', data_files={'train': os.path.join(in_f, dfile)}, num_proc=num_proc, keep_in_memory=False, cache_dir='.')
     tokenized = dataset.map(
         process,
         remove_columns=['title', 'content'],
