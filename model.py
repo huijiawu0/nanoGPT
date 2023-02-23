@@ -25,10 +25,6 @@ def new_gelu(x):
     return 0.5 * x * (1.0 + torch.tanh(math.sqrt(2.0 / math.pi) * (x + 0.044715 * torch.pow(x, 3.0))))
 
 
-def gelu_fast(x):
-    return 0.5 * x * (1.0 + torch.tanh(x * 0.7978845608 * (1.0 + 0.044715 * x * x)))
-
-
 class LayerNorm(nn.Module):
     """ LayerNorm but with an optional bias. PyTorch doesn't support simply bias=False """
     
@@ -102,7 +98,7 @@ class MLP(nn.Module):
     
     def forward(self, x):
         x = self.c_fc(x)
-        x = nn.ReLU(x)
+        x = new_gelu(x)
         x = self.c_proj(x)
         x = self.dropout(x)
         return x
