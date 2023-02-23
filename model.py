@@ -17,12 +17,12 @@ from torch.nn import functional as F
 
 
 # @torch.jit.script # good to enable when not using torch.compile, disable when using (our default)
-def new_gelu(x):
-    """
-    Implementation of the GELU activation function currently in Google BERT repo (identical to OpenAI GPT).
-    Reference: Gaussian Error Linear Units (GELU) paper: https://arxiv.org/abs/1606.08415
-    """
-    return 0.5 * x * (1.0 + torch.tanh(math.sqrt(2.0 / math.pi) * (x + 0.044715 * torch.pow(x, 3.0))))
+# def new_gelu(x):
+#     """
+#     Implementation of the GELU activation function currently in Google BERT repo (identical to OpenAI GPT).
+#     Reference: Gaussian Error Linear Units (GELU) paper: https://arxiv.org/abs/1606.08415
+#     """
+#     return 0.5 * x * (1.0 + torch.tanh(math.sqrt(2.0 / math.pi) * (x + 0.044715 * torch.pow(x, 3.0))))
 
 
 class LayerNorm(nn.Module):
