@@ -6,7 +6,7 @@ ACCESS_KEY = 'AKIA5AKOSQ7KIVCK7CJZ'
 SECRET_KEY = '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'
 BUCKET_NAME = 'datawd'
 FILE_NAME = sys.argv[1]
-KEY_PREFIX = 'wudao_' + sys.argv[1]
+KEY_PREFIX = 'wudao'
 
 # Set the chunk size for each part
 PART_SIZE = 100 * 1024 * 1024
