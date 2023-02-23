@@ -102,7 +102,7 @@ class MLP(nn.Module):
     
     def forward(self, x):
         x = self.c_fc(x)
-        x = new_gelu(x)
+        x = nn.ReLU(x)
         x = self.c_proj(x)
         x = self.dropout(x)
         return x
