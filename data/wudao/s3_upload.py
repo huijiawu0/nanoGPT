@@ -6,7 +6,7 @@ ACCESS_KEY = 'AKIA5AKOSQ7KIVCK7CJZ'
 SECRET_KEY = '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'
 BUCKET_NAME = 'datawd'
 FILE_NAME = sys.argv[1]
-KEY_PREFIX = 'wudao'
+# KEY_PREFIX = 'wudao'
 
 # Set the chunk size for each part
 PART_SIZE = 100 * 1024 * 1024
@@ -21,7 +21,7 @@ s3 = boto3.client(
 # Create a multipart upload request
 mpu_response = s3.create_multipart_upload(
     Bucket=BUCKET_NAME,
-    Key=f'{KEY_PREFIX}/{os.path.basename(FILE_NAME)}'
+    Key=f'{os.path.basename(FILE_NAME)}'
 )
 
 # Get the upload ID
@@ -46,7 +46,7 @@ with open(FILE_NAME, 'rb') as f:
         response = s3.upload_part(
             Body=data,
             Bucket=BUCKET_NAME,
-            Key=f'{KEY_PREFIX}/{os.path.basename(FILE_NAME)}',
+            Key=f'{os.path.basename(FILE_NAME)}',
             UploadId=upload_id,
             PartNumber=part_number
         )
@@ -60,7 +60,7 @@ with open(FILE_NAME, 'rb') as f:
 # Complete the multipart upload
 s3.complete_multipart_upload(
     Bucket=BUCKET_NAME,
-    Key=f'{KEY_PREFIX}/{os.path.basename(FILE_NAME)}',
+    Key=f'{os.path.basename(FILE_NAME)}',
     UploadId=upload_id,
     MultipartUpload={
         'Parts': parts
