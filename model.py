@@ -95,10 +95,11 @@ class MLP(nn.Module):
         self.c_fc = nn.Linear(config.n_embd, 4 * config.n_embd, bias=config.bias)
         self.c_proj = nn.Linear(4 * config.n_embd, config.n_embd, bias=config.bias)
         self.dropout = nn.Dropout(config.dropout)
+        self.gelu = nn.GELU()
     
     def forward(self, x):
         x = self.c_fc(x)
-        x = nn.GELU(x)
+        x = self.gelu(x)
         x = self.c_proj(x)
         x = self.dropout(x)
         return x
