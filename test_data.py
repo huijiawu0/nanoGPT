@@ -110,6 +110,7 @@ enc = tiktoken.get_encoding("gpt2")
 encode = lambda s: enc.encode(s, allowed_special={"<|endoftext|>"})
 decode = lambda l: enc.decode(l)
 for split in ['train', 'val']:
+    print(split)
     for k in range(1):
         X, Y = get_batch(split)
         print(decode(X[0].tolist()))
