@@ -6,8 +6,6 @@ from contextlib import nullcontext
 
 import numpy as np
 import torch
-import torch._dynamo
-torch._dynamo.config.suppress_errors = True
 from torch.distributed import init_process_group, destroy_process_group
 from torch.nn.parallel import DistributedDataParallel as DDP
 
@@ -112,6 +110,7 @@ enc = tiktoken.get_encoding("gpt2")
 encode = lambda s: enc.encode(s, allowed_special={"<|endoftext|>"})
 decode = lambda l: enc.decode(l)
 for split in ['train', 'val']:
-    for k in range(5):
+    for k in range(1):
         X, Y = get_batch(split)
-        print(decode(X), decode(Y))
+        print(decode(X[0].tolist()))
+        print(decode(Y[0].tolist()))
