@@ -8,7 +8,7 @@ from tqdm import tqdm
 
 num_proc = 8
 
-dataset = load_dataset('text', data_files={'train': 'policy_plain_text_100.txt'})
+dataset = load_dataset('text', data_files={'train': 'policy_plain_text.txt'})
 
 split_dataset = dataset["train"].train_test_split(test_size=0.0005, seed=2357, shuffle=True)
 split_dataset['val'] = split_dataset.pop('test')  # rename the test split to val
@@ -20,7 +20,7 @@ def process(example):
     # note: I think eot should be prepended not appended... hmm. it's called "eot" though...
     out = {'ids': ids, 'len': len(ids)}
     return out
-
+    
 
 enc = tiktoken.get_encoding("gpt2")
 
