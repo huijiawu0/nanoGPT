@@ -213,6 +213,9 @@ if init_from == 'resume':
 if compile:
     print("compiling the model... (takes a ~minute)")
     model = torch.compile(model)
+current_memory = torch.cuda.memory_allocated(device)
+max_memory = torch.cuda.max_memory_allocated(device)
+print(f"5 current memory usage {current_memory}, max memory usage {max_memory}")
 
 # wrap model into DDP container
 if ddp:
@@ -259,6 +262,10 @@ if wandb_log and master_process:
 
 # training loop
 X, Y = get_batch('train')  # fetch the very first batch
+current_memory = torch.cuda.memory_allocated(device)
+max_memory = torch.cuda.max_memory_allocated(device)
+print(f"6 current memory usage {current_memory}, max memory usage {max_memory}")
+
 t0 = time.time()
 local_iter_num = 0  # number of iterations in the lifetime of this process
 raw_model = model.module if ddp else model  # unwrap DDP container if needed
@@ -322,7 +329,10 @@ while True:
     scaler.update()
     # flush the gradients as soon as we can, no need for this memory anymore
     optimizer.zero_grad(set_to_none=True)
-    
+    current_memory = torch.cuda.memory_allocated(device)
+    max_memory = torch.cuda.max_memory_allocated(device)
+    print(f"7 current memory usage {current_memory}, max memory usage {max_memory}")
+
     # timing and logging
     t1 = time.time()
     dt = t1 - t0
@@ -335,7 +345,10 @@ while True:
         print(f"iter {iter_num}: loss {lossf:.4f}, time {dt * 1000:.2f}ms, mfu {running_mfu * 100:.2f}%")
     iter_num += 1
     local_iter_num += 1
-    
+
+    current_memory = torch.cuda.memory_allocated(device)
+    max_memory = torch.cuda.max_memory_allocated(device)
+    print(f"8 current memory usage {current_memory}, max memory usage {max_memory}")
     # termination conditions
     if iter_num > max_iters:
         break
