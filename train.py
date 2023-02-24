@@ -152,13 +152,10 @@ elif init_from == 'resume':
     print(f"Resuming training from {out_dir}")
     # resume training from a checkpoint.
     ckpt_path = os.path.join(out_dir, 'ckpt.pt')
-    current_memory = torch.cuda.memory_allocated(device)
-    max_memory = torch.cuda.max_memory_allocated(device)
-    print(f"1 current memory usage {current_memory}, max memory usage {max_memory}")
     checkpoint = torch.load(ckpt_path, map_location=device)
     current_memory = torch.cuda.memory_allocated(device)
     max_memory = torch.cuda.max_memory_allocated(device)
-    print(f"2 current memory usage {current_memory}, max memory usage {max_memory}")
+    print(f"load ckpt current memory usage {current_memory}, max memory usage {max_memory}")
     checkpoint_model_args = checkpoint['model_args']
     # force these config attributes to be equal otherwise we can't even resume training
     # the rest of the attributes (e.g. dropout) can stay as desired from command line
@@ -200,7 +197,7 @@ if block_size < model.config.block_size:
 model.to(device)
 current_memory = torch.cuda.memory_allocated(device)
 max_memory = torch.cuda.max_memory_allocated(device)
-print(f"4 current memory usage {current_memory}, max memory usage {max_memory}")
+print(f"model current memory usage {current_memory}, max memory usage {max_memory}")
 
 # initialize a GradScaler. If enabled=False scaler is a no-op
 scaler = torch.cuda.amp.GradScaler(enabled=(dtype == 'float16'))
@@ -209,19 +206,12 @@ scaler = torch.cuda.amp.GradScaler(enabled=(dtype == 'float16'))
 optimizer = model.configure_optimizers(weight_decay, learning_rate, (beta1, beta2), device_type)
 if init_from == 'resume':
     optimizer.load_state_dict(checkpoint['optimizer'])
-
-del checkpoint
-current_memory = torch.cuda.memory_allocated(device)
-max_memory = torch.cuda.max_memory_allocated(device)
-print(f"4a current memory usage {current_memory}, max memory usage {max_memory}")
+    del checkpoint
 
 # compile the model
 if compile:
     print("compiling the model... (takes a ~minute)")
     model = torch.compile(model)
-current_memory = torch.cuda.memory_allocated(device)
-max_memory = torch.cuda.max_memory_allocated(device)
-print(f"5 current memory usage {current_memory}, max memory usage {max_memory}")
 
 # wrap model into DDP container
 if ddp:
@@ -270,7 +260,7 @@ if wandb_log and master_process:
 X, Y = get_batch('train')  # fetch the very first batch
 current_memory = torch.cuda.memory_allocated(device)
 max_memory = torch.cuda.max_memory_allocated(device)
-print(f"6 current memory usage {current_memory}, max memory usage {max_memory}")
+print(f"data current memory usage {current_memory}, max memory usage {max_memory}")
 
 t0 = time.time()
 local_iter_num = 0  # number of iterations in the lifetime of this process
@@ -335,10 +325,7 @@ while True:
     scaler.update()
     # flush the gradients as soon as we can, no need for this memory anymore
     optimizer.zero_grad(set_to_none=True)
-    current_memory = torch.cuda.memory_allocated(device)
-    max_memory = torch.cuda.max_memory_allocated(device)
-    print(f"7 current memory usage {current_memory}, max memory usage {max_memory}")
-
+    
     # timing and logging
     t1 = time.time()
     dt = t1 - t0
@@ -352,9 +339,6 @@ while True:
     iter_num += 1
     local_iter_num += 1
 
-    current_memory = torch.cuda.memory_allocated(device)
-    max_memory = torch.cuda.max_memory_allocated(device)
-    print(f"8 current memory usage {current_memory}, max memory usage {max_memory}")
     # termination conditions
     if iter_num > max_iters:
         break
