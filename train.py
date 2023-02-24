@@ -196,10 +196,16 @@ print(model_args)
 if block_size < model.config.block_size:
     model.crop_block_size(block_size)
     model_args['block_size'] = block_size  # so that the checkpoint will have the right value
+
 model.to(device)
 current_memory = torch.cuda.memory_allocated(device)
 max_memory = torch.cuda.max_memory_allocated(device)
 print(f"4 current memory usage {current_memory}, max memory usage {max_memory}")
+
+del checkpoint
+current_memory = torch.cuda.memory_allocated(device)
+max_memory = torch.cuda.max_memory_allocated(device)
+print(f"4.a current memory usage {current_memory}, max memory usage {max_memory}")
 
 # initialize a GradScaler. If enabled=False scaler is a no-op
 scaler = torch.cuda.amp.GradScaler(enabled=(dtype == 'float16'))
