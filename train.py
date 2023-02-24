@@ -154,7 +154,13 @@ elif init_from == 'resume':
     print(f"Resuming training from {out_dir}")
     # resume training from a checkpoint.
     ckpt_path = os.path.join(out_dir, 'ckpt.pt')
+    current_memory = torch.cuda.memory_allocated(device)
+    max_memory = torch.cuda.max_memory_allocated(device)
+    print(f"1 current memory usage {current_memory}, max memory usage {max_memory}")
     checkpoint = torch.load(ckpt_path, map_location=device)
+    current_memory = torch.cuda.memory_allocated(device)
+    max_memory = torch.cuda.max_memory_allocated(device)
+    print(f"2 current memory usage {current_memory}, max memory usage {max_memory}")
     checkpoint_model_args = checkpoint['model_args']
     # force these config attributes to be equal otherwise we can't even resume training
     # the rest of the attributes (e.g. dropout) can stay as desired from command line
@@ -171,6 +177,9 @@ elif init_from == 'resume':
         if k.startswith(unwanted_prefix):
             state_dict[k[len(unwanted_prefix):]] = state_dict.pop(k)
     model.load_state_dict(state_dict)
+    current_memory = torch.cuda.memory_allocated(device)
+    max_memory = torch.cuda.max_memory_allocated(device)
+    print(f"3 current memory usage {current_memory}, max memory usage {max_memory}")
     iter_num = checkpoint['iter_num']
     best_val_loss = checkpoint['best_val_loss']
     print("iter_num: %d, best_val_loss: %f" % (iter_num, best_val_loss))
@@ -190,6 +199,9 @@ if block_size < model.config.block_size:
     model.crop_block_size(block_size)
     model_args['block_size'] = block_size  # so that the checkpoint will have the right value
 model.to(device)
+current_memory = torch.cuda.memory_allocated(device)
+max_memory = torch.cuda.max_memory_allocated(device)
+print(f"4 current memory usage {current_memory}, max memory usage {max_memory}")
 
 # initialize a GradScaler. If enabled=False scaler is a no-op
 scaler = torch.cuda.amp.GradScaler(enabled=(dtype == 'float16'))
