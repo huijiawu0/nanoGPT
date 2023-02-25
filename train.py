@@ -172,9 +172,6 @@ elif init_from == 'resume':
         if k.startswith(unwanted_prefix):
             state_dict[k[len(unwanted_prefix):]] = state_dict.pop(k)
     model.load_state_dict(state_dict)
-    current_memory = torch.cuda.memory_allocated(device)
-    max_memory = torch.cuda.max_memory_allocated(device)
-    print(f"3 current memory usage {current_memory}, max memory usage {max_memory}")
     iter_num = checkpoint['iter_num']
     best_val_loss = checkpoint['best_val_loss']
     print("iter_num: %d, best_val_loss: %f" % (iter_num, best_val_loss))
