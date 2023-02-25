@@ -4,8 +4,8 @@ import boto3
 
 ACCESS_KEY = 'AKIA5AKOSQ7KIVCK7CJZ'
 SECRET_KEY = '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'
-BUCKET_NAME = 'datawd'
-FILE_NAME = sys.argv[1]
+BUCKET_NAME = sys.argv[1]
+FILE_NAME = sys.argv[2]
 # KEY_PREFIX = 'wudao'
 
 # Set the chunk size for each part
