@@ -88,5 +88,5 @@ while True:
             for k in range(num_samples):
                 y = model.generate(x, max_new_tokens, temperature=temperature, top_k=top_k)
                 s = decode(y[0].tolist())
-                print(''.join(s.split()).split('')[0])
+                print(s)
                 print('---------------')
