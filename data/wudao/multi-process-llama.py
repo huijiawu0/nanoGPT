@@ -29,7 +29,7 @@ def process(example):
     ids = tokenizer(
                 title + content,
                 truncation=False
-            )["input_ids"],
+            )["input_ids"]
     out = {'ids': ids, 'len': len(ids)}
     return out
 
