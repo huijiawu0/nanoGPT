@@ -87,7 +87,7 @@ def read_jsonl(path: str):
 
 
 def get_examples(split):
-    path = os.path.join("data/", f"{split}.jsonl")
+    path = os.path.join("data/gsm8k/data/", f"{split}.jsonl")
     examples = read_jsonl(path)
 
     for ex in examples:
@@ -130,8 +130,9 @@ with torch.no_grad():
             s = decode(y[0].tolist())
             ans_ext = extract_answer(s)
             pred_ans.append(ans_ext)
-            gold_ans.append(extract_answer(example["answer"]))
-            print(''.join(s.split()).split('<|endoftext|>')[0])
+            gold = extract_answer(example["answer"])
+            gold_ans.append(gold)
+            print(s.split('<|endoftext|>')[0], ans_ext, gold)
             print('---------------')
 
 print(pred_ans)
